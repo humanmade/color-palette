@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
  */
 const HMColorPalette = ( props ) => {
 	const colorPaletteOptions = window.themeColors;
-	
+
 	const { blockColorPalette, isBlock = true, setBlockColorPalette } = props;
 	const [ documentColorPalette, setDocumentColorPalette ] = useMeta(
 		'document_color_palette'
@@ -23,11 +23,14 @@ const HMColorPalette = ( props ) => {
 	 * @return {Element} Editor wrapper element.
 	 */
 	const getEditorWrapper = () => {
-		const editorIframe = document.querySelector('iframe[name="editor-canvas"]');
-		const editorDocument = editorIframe.contentDocument || editorIframe.contentWindow.document;
+		const editorIframe = document.querySelector(
+			'iframe[name="editor-canvas"]'
+		);
+		const editorDocument =
+			editorIframe.contentDocument || editorIframe.contentWindow.document;
 
 		return editorDocument?.body;
-	}
+	};
 
 	/**
 	 * Function to update the class for the editor wrapper.
@@ -36,7 +39,7 @@ const HMColorPalette = ( props ) => {
 	 *
 	 * @return {void}
 	 */
-	const updateEditorWrapperClass = (slug) => {
+	const updateEditorWrapperClass = ( slug ) => {
 		// Get editor wrapper element.
 		const editorWrapper = getEditorWrapper();
 		if ( ! editorWrapper ) {
@@ -44,13 +47,16 @@ const HMColorPalette = ( props ) => {
 		}
 
 		// Remove old color classnames from the editor wrapper.
-		editorWrapper.className = editorWrapper.className.replace( /(?:^|\s)has-(.*)-color-palette(?!\S)/ , '' );
+		editorWrapper.className = editorWrapper.className.replace(
+			/(?:^|\s)has-(.*)-color-palette(?!\S)/,
+			''
+		);
 
 		// Add new color classname to the editor wrapper.
 		if ( slug ) {
-			editorWrapper.classList.add(`has-${ slug }-color-palette`);
+			editorWrapper.classList.add( `has-${ slug }-color-palette` );
 		}
-	}
+	};
 
 	/**
 	 * Function to get the slug of the current color.
@@ -59,13 +65,13 @@ const HMColorPalette = ( props ) => {
 	 *
 	 * @return {string|undefined} Color slug.
 	 */
-	const getSlug = (colorValue) => {
+	const getSlug = ( colorValue ) => {
 		const selectedColor = colorPaletteOptions.find(
 			( element ) => element.color === colorValue
 		);
 
 		return selectedColor?.slug;
-	}
+	};
 
 	/**
 	 * Function to get the value of the current color.
@@ -74,13 +80,13 @@ const HMColorPalette = ( props ) => {
 	 *
 	 * @return {string|undefined} Color value.
 	 */
-	const getValue = (colorSlug) => {
+	const getValue = ( colorSlug ) => {
 		const selectedColor = colorPaletteOptions.find(
 			( element ) => element.slug === colorSlug
 		);
 
 		return selectedColor?.color;
-	}
+	};
 
 	/**
 	 * Function to handle color change.
@@ -91,7 +97,7 @@ const HMColorPalette = ( props ) => {
 	 */
 	const onColorChange = ( colorValue ) => {
 		// Get the slug of the selected color value.
-		const slug = colorValue ? getSlug(colorValue) : null;
+		const slug = colorValue ? getSlug( colorValue ) : null;
 
 		// User clicked "clear".
 		if ( colorValue === undefined || colorValue === null || ! slug ) {
@@ -124,6 +130,13 @@ const HMColorPalette = ( props ) => {
 
 	const currentSlug = isBlock ? blockColorPalette : documentColorPalette;
 	const currentValue = currentSlug ? getValue( currentSlug ) : undefined;
+
+	setTimeout( () => {
+		if ( isBlock ) {
+			return;
+		}
+		updateEditorWrapperClass( currentSlug );
+	}, 3000 );
 
 	return (
 		<BaseControl
