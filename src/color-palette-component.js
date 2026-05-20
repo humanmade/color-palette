@@ -1,7 +1,10 @@
 import { useMeta } from '@humanmade/block-editor-components';
 
 import { BaseControl, ColorPalette } from '@wordpress/components';
+import { useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+
+import { editorFrameReady } from './editor-ready';
 
 /**
  * HMColorPalette component.
@@ -26,6 +29,9 @@ const HMColorPalette = ( props ) => {
 		const editorIframe = document.querySelector(
 			'iframe[name="editor-canvas"]'
 		);
+		if ( ! editorIframe ) {
+			return null;
+		}
 		const editorDocument =
 			editorIframe.contentDocument || editorIframe.contentWindow.document;
 
@@ -131,12 +137,23 @@ const HMColorPalette = ( props ) => {
 	const currentSlug = isBlock ? blockColorPalette : documentColorPalette;
 	const currentValue = currentSlug ? getValue( currentSlug ) : undefined;
 
-	setTimeout( () => {
+	useEffect( () => {
 		if ( isBlock ) {
 			return;
 		}
-		updateEditorWrapperClass( currentSlug );
-	}, 3000 );
+
+		let cancelled = false;
+
+		editorFrameReady().then( () => {
+			if ( ! cancelled ) {
+				updateEditorWrapperClass( currentSlug );
+			}
+		} );
+
+		return () => {
+			cancelled = true;
+		};
+	}, [ isBlock, currentSlug ] ); // eslint-disable-line react-hooks/exhaustive-deps
 
 	return (
 		<BaseControl
