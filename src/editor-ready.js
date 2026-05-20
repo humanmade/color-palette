@@ -97,6 +97,8 @@ export async function editorFrameReady() {
 			return;
 		}
 
-		iframe.addEventListener( 'load', () => resolve( iframe ), { once: true } );
+		iframe.addEventListener( 'load', () => resolve( iframe ), {
+			once: true,
+		} );
 	} );
 }
